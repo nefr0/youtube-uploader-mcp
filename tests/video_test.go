@@ -7,6 +7,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/therewardstore/httpmatter"
@@ -342,6 +343,7 @@ func (s *YumSuite) TestUpdateVideoPartialFailure() {
 }
 
 func (s *YumSuite) TestUpdateVideoSchedule() {
+	publishAt := time.Now().Add(24 * time.Hour).Format(time.RFC3339)
 	scheduleAssert := func(req *http.Request) int {
 		s.Equal("PUT", req.Method)
 		s.Equal("https://youtube.googleapis.com/youtube/v3/videos?alt=json&part=status&prettyPrint=false", req.URL.String())
@@ -356,7 +358,7 @@ func (s *YumSuite) TestUpdateVideoSchedule() {
 			"id": "video_id_12345",
 			"status": {
 				"privacyStatus": "private",
-				"publishAt": "2026-09-20T18:00:00+05:30",
+				"publishAt": "` + publishAt + `",
 				"license": "creativeCommon",
 				"embeddable": false,
 				"publicStatsViewable": false,
@@ -383,7 +385,7 @@ func (s *YumSuite) TestUpdateVideoSchedule() {
 			"arguments": mcp.Params{
 				"channel_id": "mock-channel-id",
 				"video_id":   "video_id_12345",
-				"publish_at": "2026-09-20T18:00:00+05:30",
+				"publish_at": publishAt,
 			},
 		}).
 		ExpectSuccessText(s.Ctx())
@@ -438,6 +440,7 @@ func (s *YumSuite) TestUpdateVideoMadeForKids() {
 }
 
 func (s *YumSuite) TestUpdateVideoScheduleAndMadeForKids() {
+	publishAt := time.Now().Add(24 * time.Hour).Format(time.RFC3339)
 	getCount := 0
 	putCount := 0
 
@@ -457,7 +460,7 @@ func (s *YumSuite) TestUpdateVideoScheduleAndMadeForKids() {
 			"id": "video_id_12345",
 			"status": {
 				"privacyStatus": "private",
-				"publishAt": "2026-09-20T18:00:00+05:30",
+				"publishAt": "` + publishAt + `",
 				"license": "creativeCommon",
 				"embeddable": false,
 				"publicStatsViewable": false,
@@ -481,7 +484,7 @@ func (s *YumSuite) TestUpdateVideoScheduleAndMadeForKids() {
 			"arguments": mcp.Params{
 				"channel_id":     "mock-channel-id",
 				"video_id":       "video_id_12345",
-				"publish_at":     "2026-09-20T18:00:00+05:30",
+				"publish_at":     publishAt,
 				"made_for_kids":  true,
 			},
 		}).
